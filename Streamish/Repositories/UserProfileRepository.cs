@@ -20,23 +20,23 @@ namespace Streamish.Repositories
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        select up.*,
-                        v.Id AS VideoId,
-                        v.Title,
-                        v.Description,
-                        v.Url,
-                        v.DateCreated VideoDateCreated,
-                        c.Id CommentId,
-                        c.Message,
-                        c.UserProfileId CommentUserProfileId
-                        from UserProfile up
-                        LEFT JOIN Video v ON v.UserProfileId = up.Id
-                        LEFT JOIN Comment c ON c.VideoId = v.Id
-                        Where up.Id = 1
-                                    ";
+                                        select up.*,
+                                        v.Id VideoId,
+                                        v.Title, 
+                                        v.Description, 
+                                        v.Url, 
+                                        v.DateCreated VideoDateCreated,
+                                        c.Id CommentId,
+                                        c.Message, 
+                                        c.UserProfileId CommentUserProfileId
+                                        from UserProfile up
+                                        LEFT JOIN Video v ON v.UserProfileId = up.Id
+                                        LEFT JOIN Comment c ON c.VideoId = v.Id
+                                        WHERE up.Id = @id;
+                                        ";
                     DbUtils.AddParameter(cmd, "@id", id);
 
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
@@ -53,37 +53,64 @@ namespace Streamish.Repositories
                                 };
                             }
 
-                        }
-                        if (DbUtils.IsNotDbNull(reader, "VideoId"))
-                        {
-                            var existingVideo = profile.Videos.FirstOrDefault(v => v.Id == DbUtils.GetInt(reader, "VideoId"));
-                            if (existingVideo == null)
+                            if (DbUtils.IsNotDbNull(reader, "VideoId"))
                             {
-                                existingVideo = new Video
+                                var existingVideo = profile.Videos.FirstOrDefault(v => v.Id == DbUtils.GetInt(reader, "VideoId"));
+                                if (existingVideo == null)
                                 {
-                                    Id = DbUtils.GetInt(reader, "VideoId"),
-                                    Title = DbUtils.GetString(reader, "Title"),
-                                    Description = DbUtils.GetString(reader, "Description"),
-                                    DateCreated = DbUtils.GetDateTime(reader, "VideoDateCreated"),
-                                    Url = DbUtils.GetString(reader, "url"),
-                                    Comments = new List<Comment>()
-                                };
-                                profile.Videos.Add(existingVideo);
-                            }
-                            if (DbUtils.IsNotDbNull(reader, "CommentId"))
-                            {
-                                existingVideo.Commets.Add(new Comment
+                                    existingVideo = new Video
+                                    {
+                                        Id = DbUtils.GetInt(reader, "VideoId"),
+                                        Title = DbUtils.GetString(reader, "Title"),
+                                        Description = DbUtils.GetString(reader, "Description"),
+                                        DateCreated = DbUtils.GetDateTime(reader, "VideoDateCreated"),
+                                        Url = DbUtils.GetString(reader, "Url"),
+                                        Comments = new List<Comment>()
+                                    };
+
+                                    profile.Videos.Add(existingVideo);
+                                }
+
+                                if (DbUtils.IsNotDbNull(reader, "CommentId"))
                                 {
-                                    Id = DbUtils.GetInt(reader, "CommentId"),
-                                    Message = DbUtils.GetString(reader, "Message"),
-                                    UserProfileId = DbUtils.GetInt(reader, "CommentUserProfileId")
-                                });
+                                    existingVideo.Comments.Add(new Comment
+                                    {
+                                        Id = DbUtils.GetInt(reader, "CommentId"),
+                                        Message = DbUtils.GetString(reader, "Message"),
+                                        UserProfileId = DbUtils.GetInt(reader, "CommentUserProfileId")
+                                    });
+                                }
                             }
                         }
                     }
                 }
             }
+
             return profile;
         }
+        public void Add(UserProfile userProfile)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        INSERT INTO UserProfile (Name, Email, ImageUrl, DateCreated)
+                        OUTPUT INSERTED.ID
+                        VALUES (@Name, @Email, @ImageUrl, @DateCreated)";
+
+                    DbUtils.AddParameter(cmd, "@Name", userProfile.Name);
+                    DbUtils.AddParameter(cmd, "@Email", userProfile.Email);
+                    DbUtils.AddParameter(cmd, "@ImageUrl", userProfile.ImageUrl);
+                    DbUtils.AddParameter(cmd, "@DateCreated", userProfile.DateCreated);
+
+
+
+                    userProfile.Id = (int)cmd.ExecuteScalar();
+                }
+            }
+        }
+
     }
 }

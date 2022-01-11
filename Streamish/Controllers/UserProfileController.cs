@@ -18,6 +18,7 @@ namespace Streamish.Controllers
         {
             _upRepo = userProfileRepository;
         }
+        [HttpGet("GetByIdWithVideos")]
         public IActionResult GetByIdWithVideos(int id)
         {
             UserProfile up = _upRepo.GetByIdWithVideo(id);
