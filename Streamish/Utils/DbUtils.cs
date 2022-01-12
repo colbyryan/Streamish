@@ -25,6 +25,7 @@ namespace Streamish.Utils
             return reader.GetString(ordinal);
         }
 
+
         /// <summary>
         ///  Get an int from a data reader object.
         ///  This method assumes the value is not NULL.
