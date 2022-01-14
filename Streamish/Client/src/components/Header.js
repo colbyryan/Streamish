@@ -24,9 +24,14 @@ export default function Header({ isLoggedIn }) {
                     <Nav className="mr-auto" navbar>
                         {isLoggedIn &&
                             <>
+
+                                <NavItem>
+                                    <NavLink tag={RRNavLink} to="/test">Favorites</NavLink>
+                                </NavItem>
                                 <NavItem>
                                     <a aria-current="page" className="nav-link"
-                                        style={{ cursor: "pointer" }} onClick={logout}>Logout</a>
+                                        style={{ cursor: "pointer" }
+                                        } onClick={logout}>Logout</a>
                                 </NavItem>
                             </>
                         }

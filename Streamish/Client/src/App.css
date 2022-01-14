@@ -13,6 +13,16 @@
   }
 }
 
+#SearchBar {
+  margin-left: 400px;
+  padding: 5px;
+  margin-bottom: 15px;
+}
+
+.searchBar h4 {
+  margin-left: 400px;
+  margin-top: 15px;
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

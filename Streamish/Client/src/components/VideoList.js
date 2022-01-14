@@ -16,7 +16,10 @@ const VideoList = () => {
 
     return (
         <>
-            <input type="text" placeholder="Search..." onChange={event => { setSearchTerm(event.target.value) }} />
+            <div className="searchBar">
+                <h4>Find a video</h4>
+                <input type="text" id="SearchBar" placeholder="Search..." onChange={event => { setSearchTerm(event.target.value) }} />
+            </div>
             <div className="container">
                 <div className="row justify-content-center">
                     {videos.filter((val) => {

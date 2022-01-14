@@ -1,10 +1,11 @@
 import React from "react";
-import { Card, CardBody } from "reactstrap"
+import { Button, Card, CardBody } from "reactstrap"
 
 const Video = ({ video }) => {
     return (
         <Card >
             <p className="text-left px-2">Posted by: {video.userProfile.name}</p>
+            <Button style={{ width: "130px", fontSize: "14px" }}>Add To Favorites</Button>
             <CardBody>
                 <iframe className="video"
                     src={video.url}

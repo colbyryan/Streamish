@@ -130,7 +130,7 @@ namespace Streamish.Repositories
 
                     var reader = cmd.ExecuteReader();
                     if (reader.Read())
-                    {
+                    { 
                         userProfile = new UserProfile()
                         {
                             Id = DbUtils.GetInt(reader, "Id"),
