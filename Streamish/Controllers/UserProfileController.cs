@@ -18,6 +18,28 @@ namespace Streamish.Controllers
         {
             _upRepo = userProfileRepository;
         }
+        [HttpGet("{firebaseUserId}")]
+        public IActionResult GetByFirebaseUserId(string firebaseUserId)
+        {
+            var userProfile = _upRepo.GetByFirebaseUserId(firebaseUserId);
+            if (userProfile == null)
+            {
+                return NotFound();
+            }
+            return Ok(userProfile);
+        }
+
+        [HttpGet("DoesUserExist/{firebaseUserId}")]
+        public IActionResult DoesUserExist(string firebaseUserId)
+        {
+            var userProfile = _upRepo.GetByFirebaseUserId(firebaseUserId);
+            if (userProfile == null)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
+
         [HttpGet("GetByIdWithVideos")]
         public IActionResult GetByIdWithVideos(int id)
         {
@@ -27,6 +49,15 @@ namespace Streamish.Controllers
                 return NotFound();
             }
             return Ok(up);
+        }
+
+        [HttpPost]
+        public IActionResult Register(UserProfile userProfile)
+        {
+            // All newly registered users start out as a "user" user type (i.e. they are not admins)
+            _upRepo.Add(userProfile);
+            return CreatedAtAction(
+                nameof(GetByFirebaseUserId), new { firebaseUserId = userProfile.FirebaseUserId }, userProfile);
         }
     }
 }
